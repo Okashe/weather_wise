@@ -8,6 +8,13 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  @override
+  //this enables to print long and lat everytime you restart the app without tapping on the button
+  void initState() {
+    super.initState();
+    getLocation();
+  }
+
   void getLocation() async {
     LocationPermission permission;
 
@@ -27,8 +34,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
         return;
       }
     }
-    Future<Position> position =
-        Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.low);
     print(position);
   }
 
