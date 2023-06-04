@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:weather_wise/services/location.dart';
+import 'package:weather_wise/services/networking.dart';
+import 'package:weather_wise/screens/location_screen.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+String apiKey = 'bdfe5df222bf529eb2d880c4e4159595';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -8,47 +13,50 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  //Location location = Location();
+
   @override
   //this enables to print long and lat everytime you restart the app without tapping on the button
   void initState() {
     super.initState();
-    getLocation();
+    getLocationData();
   }
 
-  void getLocation() async {
-    LocationPermission permission;
+  void getLocationData() async {
+    Location location = Location();
+    await location.getCurrentLocation();
+    // latitude = location.latitude;
+    // longitude = location.longitude;
 
-    // Check if location service is enabled
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Handle if location service is disabled
-      return;
-    }
+    NetworkHelper networkHelper = NetworkHelper(
+        'https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=$apiKey&units=metric');
 
-    // Request location permission
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Handle if location permission is denied
-        return;
-      }
-    }
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low);
-    print(position);
+    var weatherData = await networkHelper.getData();
+
+    Navigator.push((context), MaterialPageRoute(builder: (context) {
+      return LocationScreen(
+        locationWeather: weatherData,
+      );
+    }));
   }
+
+  // double temperature = decodedData['main']['temp'];
+  // int condition = decodedData['weather'][0]['id'];
+  // String city = decodedData['name'];
+
+  // print(temperature);
+  // print(condition);
+  // print(city);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-          child: ElevatedButton(
-        onPressed: () {
-          getLocation();
-        },
-        child: const Text('Get Location'),
-      )),
+        child: SpinKitDoubleBounce(
+          color: Colors.white,
+          size: 100.0,
+        ),
+      ),
     );
   }
 }
