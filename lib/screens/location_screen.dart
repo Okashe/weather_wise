@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_wise/utilities/constants.dart';
 import 'package:weather_wise/services/weather.dart';
+import 'city_screen.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key, required this.locationWeather});
@@ -25,12 +26,21 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   void updateUI(dynamic weatherData) {
-    double temp = weatherData['main']['temp'];
-    temperature = temp.toInt();
-    var condition = weatherData['weather'][0]['id'];
-    weatherIcon = weather.getWeatherIcon(condition);
-    weatherMessage = weather.getMessage(temperature);
-    cityName = weatherData['name'];
+    setState(() {
+      if (weatherData == null) {
+        temperature = 0;
+        weatherIcon = 'Error';
+        weatherMessage = 'Unable to get weather data ';
+        cityName = '';
+        return;
+      }
+      double temp = weatherData['main']['temp'];
+      temperature = temp.toInt();
+      var condition = weatherData['weather'][0]['id'];
+      weatherIcon = weather.getWeatherIcon(condition);
+      weatherMessage = weather.getMessage(temperature);
+      cityName = weatherData['name'];
+    });
   }
 
   @override
@@ -55,7 +65,10 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var weatherData = await weather.getLocationWeather();
+                      updateUI(weatherData);
+                    },
                     child: const Icon(
                       Icons.near_me,
                       color: Colors.white,
@@ -63,7 +76,12 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return CityScreen();
+                      }));
+                    },
                     child: const Icon(
                       Icons.location_city,
                       color: Colors.white,
