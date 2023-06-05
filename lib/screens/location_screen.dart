@@ -76,11 +76,19 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(context,
+                    onPressed: () async {
+                      //we never know when the user in going to type
+                      //that's why it returns future .
+                      //if we need to use the typedName somewhere later on we have to make this await
+                      var typedName = await Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                        return CityScreen();
+                        return const CityScreen();
                       }));
+                      if (typedName != null) {
+                        var weatherData =
+                            await weather.getCityWeather(typedName);
+                        updateUI(weatherData);
+                      }
                     },
                     child: const Icon(
                       Icons.location_city,
