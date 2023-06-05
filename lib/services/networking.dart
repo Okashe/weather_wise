@@ -10,6 +10,7 @@ class NetworkHelper {
 
     if (response.statusCode == 200) {
       String data = response.body;
+
       return jsonDecode(data);
     } else {
       print(response.statusCode);
@@ -18,8 +19,8 @@ class NetworkHelper {
 }
 
 // class ApiRequestHelper {
-//   String url = 'api.openweathermap.org';
-//   String endpoint = '/data/2.5/weather';
+  // String url = 'api.openweathermap.org';
+  // String endpoint = '/data/2.5/weather';
 //   String apiKey = 'bdfe5df222bf529eb2d880c4e4159595';
 //   double? latitude;
 //   double? longitude;
